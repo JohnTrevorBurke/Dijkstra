@@ -39,6 +39,7 @@ namespace Library.Tests
             var shortestPathInfo = graph.CalculateShortestPath("A", "D");
             CollectionAssert.AreEqual(new []{"A", "B", "C", "D"}, shortestPathInfo.Steps.Select(s=>s.Vertex.Name));
             Assert.AreEqual(shortestPathInfo.TotalCost, 9);
+            Assert.AreEqual("Best Path: (A)-5-(B)-2-(C)-2-(D). Total Cost: 9", shortestPathInfo.ToString());
         }
 
         [Test]
@@ -82,7 +83,18 @@ namespace Library.Tests
         [Test]
         public void ShouldHandleNoRoute()
         {
+            var graph = new Graph();
+            graph.AddVertex("A");
+            graph.AddVertex("B");
+            graph.AddVertex("C");
 
+            graph.AddEdge("A", "B", 5);
+            graph.AddEdge("C", "B", 10, false);
+
+            var shortestPath = graph.CalculateShortestPath("A", "C");
+            CollectionAssert.AreEqual(new []{"A"}, shortestPath.Steps.Select(s=>s.Vertex.Name));
+            Assert.AreEqual(null, shortestPath.TotalCost);
+            Assert.AreEqual("Best Path: (A). Total Cost: Infinite", shortestPath.ToString());
         }
     }
 }

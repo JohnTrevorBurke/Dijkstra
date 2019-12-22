@@ -28,18 +28,19 @@ namespace Dijkstra
              var insertIndex = _pathItems.Count;
             _pathItemIndicies.Add(item, insertIndex);     
             _pathItems.Insert(insertIndex, item);
-            item.OnUpdateTotalCost((i)=>{
-                if (!_pathItemIndicies.ContainsKey(i))
-                    return;
-                ReorderToTreeBase(i);
-                ReorderToTreeRoot(i);
-            });
+            item.OnUpdateTotalCost(RebalanceHeap);
             ReorderToTreeRoot(item);
         }
 
         public object Peek()
         {
             return _pathItems[0];
+        }
+
+        private void RebalanceHeap(PathItem i)
+        {
+            ReorderToTreeBase(i);
+            ReorderToTreeRoot(i);
         }
 
         private void ReorderToTreeRoot(PathItem i)
@@ -98,6 +99,7 @@ namespace Dijkstra
                 ReorderToTreeBase(lastItem);
             }
 
+            highestPriorityItem.DeleteOnUpdateTotalCost(RebalanceHeap);
             return highestPriorityItem;
         }
     }

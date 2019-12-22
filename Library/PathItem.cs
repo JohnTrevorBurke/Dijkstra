@@ -5,7 +5,7 @@ namespace Dijkstra
 {
     public class PathItem : IComparable
     {
-        public int TotalCost { 
+        public int? TotalCost { 
             get
             {
                 return _totalCost;
@@ -19,7 +19,7 @@ namespace Dijkstra
         public Vertex Vertex {get; set; }
         public Edge OptimalEdge {get; set;}
         private List<Action<PathItem>> _totalCostUpdateRegistrations;
-        private int _totalCost;
+        private int? _totalCost;
         public PathItem()
         {
             _totalCostUpdateRegistrations = new List<Action<PathItem>>(1);
@@ -33,13 +33,23 @@ namespace Dijkstra
             if(!(obj is PathItem))
                 throw new ArgumentException($"{obj.GetType().ToString()} is an invalid type. Can only compare a PathItem to another PathItem");
 
+            var otherCost = ((PathItem)obj).TotalCost;
+            if (TotalCost == null)
+                return otherCost == null ? 0 : 1;
+            if (otherCost == null)
+                return -1;
 
-            return TotalCost.CompareTo(((PathItem)obj).TotalCost);
+            return TotalCost.Value.CompareTo(otherCost.Value);
         }
 
         internal void OnUpdateTotalCost(Action<PathItem> r)
         {
             _totalCostUpdateRegistrations.Add(r);
+        }
+
+        internal void DeleteOnUpdateTotalCost(Action<PathItem> r)
+        {
+            _totalCostUpdateRegistrations.Remove(r);
         }
 
         public override string ToString(){

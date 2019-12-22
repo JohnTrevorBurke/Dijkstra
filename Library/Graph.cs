@@ -49,7 +49,7 @@ namespace Dijkstra
             var allPaths = _vertices
                 .ToDictionary(kv=>kv.Key, kv=>{
                     var v = kv.Value;
-                    return new PathItem{Vertex = v, TotalCost = v.Name == initialVertexName ? 0 : int.MaxValue};
+                    return new PathItem { Vertex = v, TotalCost = v.Name == initialVertexName ? 0 : (int?)null };
                 });
             
             var unvisited = new PathPriorityQueue(allPaths.Count);
@@ -59,14 +59,14 @@ namespace Dijkstra
             var destinationPath = allPaths[destinationVertexName];
             while(unvisited.Count > 0){
                 var currentShortestPath = unvisited.Pop();
-                if(destinationPath.OptimalEdge != null && currentShortestPath.TotalCost >= destinationPath.TotalCost)
+                if(destinationPath.OptimalEdge != null && currentShortestPath.CompareTo(destinationPath) >= 0)
                     break;
 
                 foreach(var edge in currentShortestPath.Vertex.Edges){
                     var childVertex = edge.ConnectsTo;
                     var computedCost = edge.Cost + currentShortestPath.TotalCost;
                     var childPathInfo = allPaths[childVertex.Name];
-                    if(computedCost < childPathInfo.TotalCost){
+                    if(childPathInfo.TotalCost == null || computedCost < childPathInfo.TotalCost){
                         childPathInfo.TotalCost = computedCost;
                         childPathInfo.OptimalEdge = edge;
                     }
@@ -79,7 +79,7 @@ namespace Dijkstra
                 result.Steps.AddFirst(path);
                 path = allPaths[path.OptimalEdge.ConnectsFrom.Name];
             }
-            result.Steps.AddFirst(path);
+            result.Steps.AddFirst(allPaths[initialVertexName]);
 
             return result;
         }
