@@ -6,10 +6,9 @@ namespace Dijkstra
 {
     public class PathPriorityQueue
     {
+        public int Count => _pathItems.Count;
         private Dictionary<PathItem, int> _pathItemIndicies;
         private List<PathItem> _pathItems;
-
-        public double Count => _pathItems.Count;
 
         public PathPriorityQueue()
         {
@@ -21,6 +20,12 @@ namespace Dijkstra
         {
             _pathItemIndicies = new Dictionary<PathItem, int>(intialSize);
             _pathItems = new List<PathItem>(intialSize);
+        }
+
+        public PathPriorityQueue(PathItem[] items) : this(items.Count())
+        {
+            foreach(var p in items)
+                this.Enqueue(p);         
         }
 
         public void Enqueue(PathItem item)

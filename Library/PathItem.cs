@@ -53,7 +53,9 @@ namespace Dijkstra
         }
 
         public override string ToString(){
-            return OptimalEdge != null ? $"Path: ({OptimalEdge.ConnectsFrom.Name})-{OptimalEdge?.Cost}-({OptimalEdge?.ConnectsTo.Name})" : $"Point: {Vertex?.Name}";
+            return OptimalEdge != null ? 
+            $"Path: ({OptimalEdge.ConnectsFrom.Name})-{OptimalEdge.Cost}-({OptimalEdge.ConnectsTo.Name})" : 
+            $"Point: {Vertex?.Name}";
         }
     }
 

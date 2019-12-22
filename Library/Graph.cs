@@ -51,11 +51,8 @@ namespace Dijkstra
                     var v = kv.Value;
                     return new PathItem { Vertex = v, TotalCost = v.Name == initialVertexName ? 0 : (int?)null };
                 });
-            
-            var unvisited = new PathPriorityQueue(allPaths.Count);
-            foreach(var p in allPaths)
-                unvisited.Enqueue(p.Value);
 
+            var unvisited = new PathPriorityQueue(allPaths.Values.ToArray());
             var destinationPath = allPaths[destinationVertexName];
             while(unvisited.Count > 0){
                 var currentShortestPath = unvisited.Pop();
@@ -73,15 +70,7 @@ namespace Dijkstra
                 }
             }
 
-            var result = new ShortestPathResult();
-            var path = destinationPath;
-            while(path.OptimalEdge != null){
-                result.Steps.AddFirst(path);
-                path = allPaths[path.OptimalEdge.ConnectsFrom.Name];
-            }
-            result.Steps.AddFirst(allPaths[initialVertexName]);
-
-            return result;
+            return new ShortestPathResult(initialVertexName, destinationVertexName, allPaths);
         }
     }
 }

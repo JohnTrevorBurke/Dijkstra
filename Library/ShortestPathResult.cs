@@ -7,9 +7,16 @@ namespace Dijkstra
     {
         public LinkedList<PathItem> Steps { get; private set; }
 
-        public ShortestPathResult()
+        public ShortestPathResult(string initialVertexName, string destinationVertexName, Dictionary<string, PathItem> allPaths)
         {
             Steps = new LinkedList<PathItem>();
+
+            var path = allPaths[destinationVertexName];
+            while(path.OptimalEdge != null){
+                Steps.AddFirst(path);
+                path = allPaths[path.OptimalEdge.ConnectsFrom.Name];
+            }
+            Steps.AddFirst(allPaths[initialVertexName]);
         }
 
         public int? TotalCost => Steps.Skip(1).LastOrDefault()?.TotalCost;

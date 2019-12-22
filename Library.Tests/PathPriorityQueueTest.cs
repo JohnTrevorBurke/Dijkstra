@@ -123,9 +123,9 @@ namespace Library.Tests
             var queue = new PathPriorityQueue();
             var items = new List<PathItem>();
             var random = new Random();
-            for(var i = 0; i<100; i++)
+            for(var i = 0; i<5000; i++)
             {
-                var item = new PathItem { TotalCost = random.Next(0, 100) };
+                var item = new PathItem { TotalCost = random.Next(0, 100000) };
                 items.Add(item);
                 queue.Enqueue(item);
             }
@@ -140,7 +140,7 @@ namespace Library.Tests
             for(var i = 0; i<50; i++)
             {
                 var item = items[i];
-                item.TotalCost = random.Next(0,1000);
+                item.TotalCost = random.Next(0,100000);
             }
 
             for(var i = 0; i<20; i++)
@@ -150,7 +150,7 @@ namespace Library.Tests
                 queue.Enqueue(item);
             }
 
-            for(var i = 0; i<50; i++)
+            for(var i = 0; i<4500; i++)
             {
                 var min = items.OrderBy(x => x.TotalCost).First();
                 Assert.AreEqual(min.TotalCost, queue.Pop().TotalCost, $"Failed at index {i}.");
@@ -169,6 +169,21 @@ namespace Library.Tests
                 Assert.AreEqual(min.TotalCost, queue.Pop().TotalCost, $"Failed at index {i}.");
                 items.Remove(min);
             }
+
+            for(var i = 0; i<400; i++)
+            {
+                var item = items[i];
+                item.TotalCost = random.Next(0,100000);
+            }
+
+            for(var i = 0; i<450; i++)
+            {
+                var min = items.OrderBy(x => x.TotalCost).First();
+                Assert.AreEqual(min.TotalCost, queue.Pop().TotalCost, $"Failed at index {i}.");
+                items.Remove(min);
+            }
+
+            Assert.AreEqual(0, queue.Count);
         }
     }
 }
