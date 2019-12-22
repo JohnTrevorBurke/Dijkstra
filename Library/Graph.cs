@@ -29,14 +29,16 @@ namespace Dijkstra
 
             _vertices[startVertexName].Edges.Add(new Edge
             {
-                ConnectsTo = _vertices[endVertexName], 
+                ConnectsFrom = _vertices[startVertexName],
+                ConnectsTo = _vertices[endVertexName],
                 Cost = cost
             });
 
             if(biDirectional){
                 _vertices[endVertexName].Edges.Add(new Edge
                 {
-                    ConnectsTo = _vertices[startVertexName], 
+                    ConnectsFrom = _vertices[endVertexName],
+                    ConnectsTo = _vertices[startVertexName],
                     Cost = cost
                 });
             }
@@ -50,21 +52,22 @@ namespace Dijkstra
                     return new PathItem{Vertex = v, TotalCost = v.Name == initialVertexName ? 0 : int.MaxValue};
                 });
             
-            var unvisited = allPaths.Select(x=>x.Value).ToList();
+            var unvisited = new PathPriorityQueue(allPaths.Count);
+            foreach(var p in allPaths)
+                unvisited.Enqueue(p.Value);
+
             var destinationPath = allPaths[destinationVertexName];
-            while(unvisited.Any()){
-                var currentShortestPath = unvisited.OrderBy(v=>v.TotalCost).First();
-                if(destinationPath.OptimalParent != null && currentShortestPath.TotalCost >= destinationPath.TotalCost)
+            while(unvisited.Count > 0){
+                var currentShortestPath = unvisited.Pop();
+                if(destinationPath.OptimalEdge != null && currentShortestPath.TotalCost >= destinationPath.TotalCost)
                     break;
 
-                unvisited.Remove(currentShortestPath);
                 foreach(var edge in currentShortestPath.Vertex.Edges){
                     var childVertex = edge.ConnectsTo;
                     var computedCost = edge.Cost + currentShortestPath.TotalCost;
                     var childPathInfo = allPaths[childVertex.Name];
                     if(computedCost < childPathInfo.TotalCost){
                         childPathInfo.TotalCost = computedCost;
-                        childPathInfo.OptimalParent = currentShortestPath.Vertex;
                         childPathInfo.OptimalEdge = edge;
                     }
                 }
@@ -72,9 +75,9 @@ namespace Dijkstra
 
             var result = new ShortestPathResult();
             var path = destinationPath;
-            while(path.OptimalParent != null){
+            while(path.OptimalEdge != null){
                 result.Steps.AddFirst(path);
-                path = allPaths[path.OptimalParent.Name];
+                path = allPaths[path.OptimalEdge.ConnectsFrom.Name];
             }
             result.Steps.AddFirst(path);
 
